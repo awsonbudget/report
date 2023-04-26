@@ -4,17 +4,22 @@ import httpx
 from tqdm import tqdm
 
 NUM_REQUESTS = 1000  # Number of requests to send
-CONCURRENCY = 50  # Number of requests to send concurrently
-URL = "https://winter2023-comp598-group06-02.cs.mcgill.ca/light/sort/50/50/"  # The endpoint to send requests to
-timeout = httpx.Timeout(30.0)
+CONCURRENCY = 10  # Number of requests to send concurrently
+URL = "https://winter2023-comp598-group06-02.cs.mcgill.ca/light/sort/200/200/"  # The endpoint to send requests to
+timeout = httpx.Timeout(60.0)
 
 
 async def send_request():
     async with httpx.AsyncClient(timeout=timeout) as client:
         start_time = time.monotonic()
-        response = await client.get(URL)
+        code = 0
+        try:
+            response = await client.get(URL)
+            code = response.status_code
+        except httpx.ConnectError:
+            code = 408
         end_time = time.monotonic()
-        return response.status_code, end_time - start_time
+        return code, end_time - start_time
 
 
 async def send_requests():
